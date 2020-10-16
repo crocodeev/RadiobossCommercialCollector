@@ -133,7 +133,7 @@ $GroupBoxMail.controls.AddRange(@($CheckBoxMailOn,$LabelMailAddress,$TextBoxMail
 # global integers
 
 $PredefinedCheckboxes = $ReklamaCheckBox, $JingleCheckBox, $BilboardCheckBox 
-$filePath 
+$contentFolder = ".\Collection"
 
 $ButtonSchedulePath.Add_Click({
     $filePath = Get-FilePath
@@ -143,6 +143,7 @@ $ButtonSchedulePath.Add_Click({
 #main function
 
 $ButtonAction.Add_Click({
+
 
     #get content of schedule file
 
@@ -158,6 +159,7 @@ $ButtonAction.Add_Click({
 
     $Pattern = Get-PredefinedPatterns $PredefinedCheckboxes
 
+
     if($CustomCheckBox.Checked){
         $CustomPattern = Get-UserPattern
     }
@@ -167,14 +169,18 @@ $ButtonAction.Add_Click({
 
     forEach($key in $schedule.Keys){
         
-        $path = $schedule[$key].FileName
+        $event = $schedule[$key]
 
-        if($Pattern -ne "()" -and $path -match $Pattern){
-            Write-Host $path
+        if($Pattern -ne "()" -and $event.FileName -match $Pattern){
+            # check is event active
+            if($event.EnabledEvent){
+            }
         }
 
-        if($CustomPattern -ne $null -and $path -match $CustomPattern){
-            Write-Host $path
+        if($CustomPattern -ne $null -and $event.FileName -match $CustomPattern){
+            # check is evet active
+            if($event.EnabledEvent){
+            }
         }
     }
 
@@ -229,8 +235,8 @@ function Get-PredefinedPatterns($checkboxes){
 
         if($checkbox.Checked){
 
-            $Patterns += $checkbox.text.split("/")[0]
-            $Patterns += $checkbox.text.split("/")[1]
+            $Patterns += $checkbox.text.split("/")[0] + " -"
+            $Patterns += $checkbox.text.split("/")[1] + " -"
         }
     }
 
@@ -273,4 +279,36 @@ function Format-Name($string){
     $string.Substring($string.IndexOf("-")+2)
 }
 
+
+function Write-Details($event, $type){
+
+    if($type -eq "folder" -or $type -eq "playlist"){
+
+        Write-Host "Under Construction"
+
+    }else{
+
+        $message = Format-Name $event.FileName
+        $message += " c "
+        $message += $event.UseDate ? $event.DateTime : "----"
+        $message += " до "
+        $message += $event.DelTaskUseDate ? $event.DelTaskTime : "-----"  
+
+        #check is there hours?
+        if($event.Hours.Contains("1")){
+            $hours = $event.Hours.toCharArray()
+            $count
+
+            
+            
+            
+
+        }else{
+
+        }
+    
+    }
+
+
+}
 

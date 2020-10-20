@@ -174,22 +174,34 @@ $ButtonAction.Add_Click({
         if($Pattern -ne "()" -and $event.FileName -match $Pattern){
             # check is event active
             if($event.EnabledEvent){
+            $details = Get-Details $event
+            Write-Host $details
+            Copy-Item -Path $event.FileName -Destination $contentFolder
             }
         }
 
         if($CustomPattern -ne $null -and $event.FileName -match $CustomPattern){
             # check is evet active
             if($event.EnabledEvent){
+            $details = Get-Details $event
+            Write-Host $details
+            Copy-Item -Path $event.FileName -Destination $contentFolder
             }
         }
+
+        if($CheckBoxPlaylist.Checked -and $event.FileName -match "m3u*"){
+            $details = Get-Details $event "playlist"
+        }
+
+        if($CheckBoxFolders.Checked -and $event.FileName -match "getfile"){
+            $details = Get-Details $event "folder"
+        }
+
     }
 
     
 
 })
-
-
-$main.ShowDialog()
 
 
 
@@ -279,36 +291,73 @@ function Format-Name($string){
     $string.Substring($string.IndexOf("-")+2)
 }
 
+function Format-Date($string){
+    $string.Substring(11)
+}
 
-function Write-Details($event, $type){
+
+function Get-Details($event, $type){
 
     if($type -eq "folder" -or $type -eq "playlist"){
 
-        Write-Host "Under Construction"
+        
 
     }else{
 
         $message = Format-Name $event.FileName
         $message += " c "
-        $message += $event.UseDate ? $event.DateTime : "----"
+        $message += If($event.UseDate){$event.DateTime}Else{"----"}
         $message += " до "
-        $message += $event.DelTaskUseDate ? $event.DelTaskTime : "-----"  
+        $message += If($event.DelTaskUseDate){$event.DelTaskTime}Else{"-----"}  
 
         #check is there hours?
         if($event.Hours.Contains("1")){
+
             $hours = $event.Hours.toCharArray()
-            $count
+            $count = 0
+            $startPosition = $event.Hours.IndexOf("1");
+      
+
+            for($i = $startPosition; $i -lt $event.Hours.Length; $i++){
+             
+                if($event.Hours[$i] -ne $event.Hours[$i+1] -and $count -lt 1){
+                  $message += " нестандартная ротация"
+                  break  
+                }elseif($event.Hours[$i] -eq $event.Hours[$i+1]){
+                  $count++  
+                }
+            }
 
             
+            if($count -ge 8){
+            $message += " 1 раз в час"
+            }elseif($message -notmatch "нестандартная ротация"){
+            $message += " нестандартная ротация"
+            }
             
-            
-
         }else{
 
-        }
-    
-    }
+            if($event.Repeat){
+            $message += "1 раз в ${$event.RepeatPeriod} минут"
+            }else{
+            $message = Format-Date $event.DateTime
+            }
 
+        }
+
+     return $message
+    }
 
 }
 
+Check-Playlist($file){
+
+}
+
+Check-Folder($path){
+
+}
+
+
+#Start program
+$main.ShowDialog()

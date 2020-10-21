@@ -189,12 +189,36 @@ $ButtonAction.Add_Click({
             }
         }
 
+        #playlist parse
+
         if($CheckBoxPlaylist.Checked -and $event.FileName -match "m3u*"){
             $details = Get-Details $event "playlist"
         }
 
+        #folder parse
+
         if($CheckBoxFolders.Checked -and $event.FileName -match "getfile"){
-            $details = Get-Details $event "folder"
+            #path to folder
+            $folderPath = Get-PathFolder $event.FileName
+            #check is contain commercial files
+            if(Check-Folder $folderPath){
+              $details = Get-Details $event "folder"  
+              $files = Get-ChildItem -Path $folderPath
+              $filesNames = @() 
+             
+              # copy files to Collection folder and collect it's names
+              forEach($file in $files){
+                Copy-Item -Path $file.FullName -Destination $contentFolder
+                $fileNames += Format-Name $file.Name
+                $fileNames += ", "
+              }
+
+             
+              $details += $fileNames | Out-String
+
+              Write-Host $details
+                
+            }
         }
 
     }
@@ -298,9 +322,51 @@ function Format-Date($string){
 
 function Get-Details($event, $type){
 
-    if($type -eq "folder" -or $type -eq "playlist"){
+    if($type -eq "folder"){
+        $message = "Из папки "
+        $message += " c "
+        $message += If($event.UseDate){$event.DateTime}Else{"----"}
+        $message += " до "
+        $message += If($event.DelTaskUseDate){$event.DelTaskTime}Else{"-----"} 
 
+        #check is there hours?
+        if($event.Hours.Contains("1")){
+
+            $hours = $event.Hours.toCharArray()
+            $count = 0
+            $startPosition = $event.Hours.IndexOf("1");
+      
+
+            for($i = $startPosition; $i -lt $event.Hours.Length; $i++){
+             
+                if($event.Hours[$i] -ne $event.Hours[$i+1] -and $count -lt 1){
+                  $message += " нестандартная ротация"
+                  break  
+                }elseif($event.Hours[$i] -eq $event.Hours[$i+1]){
+                  $count++  
+                }
+            }
+
+            
+            if($count -ge 8){
+            $message += " 1 раз в час "
+            }elseif($message -notmatch "нестандартная ротация"){
+            $message += " нестандартная ротация"
+            }
+            
+        }else{
+
+            if($event.Repeat){
+            $message += " 1 раз в ${$event.RepeatPeriod} минут. "
+            }else{
+            $message = Format-Date $event.DateTime
+            }
+
+        }
+
+        return $message
         
+    }elseif($type -eq "playlist"){
 
     }else{
 
@@ -350,12 +416,35 @@ function Get-Details($event, $type){
 
 }
 
-Check-Playlist($file){
+function Check-Playlist($file){
+    
+}
+
+
+function Check-Folder($path){
+    $files = Get-ChildItem -Path $path
+    $Pattern = "(Реклама -)|(Reklama -)|(Джингл -)|(Jingle -)|(Билборд -)|(Billboard -)"
+    $result
+
+    forEach($file in $files){
+        if($file.Name -match $Pattern){
+        $result = $true
+        break
+        }
+    }
+
+    if($result -eq $null){
+     $result = $false
+    }
+
+    return $result
 
 }
 
-Check-Folder($path){
 
+
+function Get-PathFolder($filename){
+    return $filename.Split('"')[1]
 }
 
 

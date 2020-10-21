@@ -144,6 +144,14 @@ $ButtonSchedulePath.Add_Click({
 
 $ButtonAction.Add_Click({
 
+    #list file create
+    if(!(Test-Path list.txt)){
+        New-Item list.txt
+    }else{
+        Set-Content -Path list.txt -Value ""
+    }
+
+    $content = @()
 
     #get content of schedule file
 
@@ -175,7 +183,8 @@ $ButtonAction.Add_Click({
             # check is event active
             if($event.EnabledEvent){
             $details = Get-Details $event
-            Write-Host $details
+        
+            $content += $details
             Copy-Item -Path $event.FileName -Destination $contentFolder
             }
         }
@@ -184,7 +193,8 @@ $ButtonAction.Add_Click({
             # check is evet active
             if($event.EnabledEvent){
             $details = Get-Details $event
-            Write-Host $details
+
+            $content += $details
             Copy-Item -Path $event.FileName -Destination $contentFolder
             }
         }
@@ -192,7 +202,21 @@ $ButtonAction.Add_Click({
         #playlist parse
 
         if($CheckBoxPlaylist.Checked -and $event.FileName -match "m3u*"){
-            $details = Get-Details $event "playlist"
+            
+
+            $event.FileName
+
+            #check is contain commercial files
+            $playListPath = $event.FileName.Split("*")[0]
+            if(Check-Playlist $playListPath){
+                $details = Get-Details $event "playlist"
+                $content += $details
+                $playlist = Get-Content $playListPath
+                $filePaths = Get-PlaylistTracks $playlist
+
+                $filePaths | ForEach-Object {Write-Host $_}
+
+            }
         }
 
         #folder parse
@@ -216,15 +240,18 @@ $ButtonAction.Add_Click({
              
               $details += $fileNames | Out-String
 
-              Write-Host $details
+              $content += $details
                 
             }
         }
 
     }
 
-    
 
+    # write list to file
+    
+    $content | Out-File list.txt -Append
+    
 })
 
 
@@ -368,6 +395,49 @@ function Get-Details($event, $type){
         
     }elseif($type -eq "playlist"){
 
+        $message = "Из плейлиста "
+        $message += " c "
+        $message += If($event.UseDate){$event.DateTime}Else{"----"}
+        $message += " до "
+        $message += If($event.DelTaskUseDate){$event.DelTaskTime}Else{"-----"} 
+
+        #check is there hours?
+        if($event.Hours.Contains("1")){
+
+            $hours = $event.Hours.toCharArray()
+            $count = 0
+            $startPosition = $event.Hours.IndexOf("1");
+      
+
+            for($i = $startPosition; $i -lt $event.Hours.Length; $i++){
+             
+                if($event.Hours[$i] -ne $event.Hours[$i+1] -and $count -lt 1){
+                  $message += " нестандартная ротация"
+                  break  
+                }elseif($event.Hours[$i] -eq $event.Hours[$i+1]){
+                  $count++  
+                }
+            }
+
+            
+            if($count -ge 8){
+            $message += " 1 раз в час"
+            }elseif($message -notmatch "нестандартная ротация"){
+            $message += " нестандартная ротация"
+            }
+            
+        }else{
+
+            if($event.Repeat){
+            $message += " 1 раз в ${$event.RepeatPeriod} минут"
+            }else{
+            $message = Format-Date $event.DateTime
+            }
+
+        }
+
+        return $message
+
     }else{
 
         $message = Format-Name $event.FileName
@@ -416,8 +486,23 @@ function Get-Details($event, $type){
 
 }
 
-function Check-Playlist($file){
-    
+function Check-Playlist($path){
+    $content = Get-Content -Path $path
+    $Pattern = "(Реклама -)|(Reklama -)|(Джингл -)|(Jingle -)|(Билборд -)|(Billboard -)"
+    $result
+
+    forEach($string in $content){
+    if($string -match $Pattern ){
+    $result = $true
+        break
+    }
+    }
+
+    if($result -eq $null){
+     $result = $false
+    }
+
+    return $result
 }
 
 
@@ -445,6 +530,20 @@ function Check-Folder($path){
 
 function Get-PathFolder($filename){
     return $filename.Split('"')[1]
+}
+
+
+function Get-PlaylistTracks($playlist){
+    $paths = @()
+    $Pattern = "(Реклама -)|(Reklama -)|(Джингл -)|(Jingle -)|(Билборд -)|(Billboard -)"
+
+    forEach($item in $playlist){
+        if($item -match $Pattern -and $item -notmatch "#"){
+            $paths += $item
+        }
+    }
+
+    return $paths
 }
 
 

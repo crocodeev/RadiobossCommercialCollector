@@ -2,7 +2,7 @@
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $main                            = New-Object system.Windows.Forms.Form
-$main.ClientSize                 = New-Object System.Drawing.Point(622,266)
+$main.ClientSize                 = New-Object System.Drawing.Point(622,400)
 $main.text                       = "commercialCollector"
 $main.TopMost                    = $false
 
@@ -82,7 +82,7 @@ $CheckBoxFolders.location        = New-Object System.Drawing.Point(10,55)
 $CheckBoxFolders.Font            = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $GroupBoxMail                    = New-Object system.Windows.Forms.Groupbox
-$GroupBoxMail.height             = 56
+$GroupBoxMail.height             = 200
 $GroupBoxMail.width              = 586
 $GroupBoxMail.text               = "Отправить по почте"
 $GroupBoxMail.location           = New-Object System.Drawing.Point(18,159)
@@ -96,20 +96,70 @@ $CheckBoxMailOn.location         = New-Object System.Drawing.Point(15,25)
 $CheckBoxMailOn.Font             = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $LabelMailAddress                = New-Object system.Windows.Forms.Label
-$LabelMailAddress.text           = "Почтовый ящик"
+$LabelMailAddress.text           = "Кому"
 $LabelMailAddress.AutoSize       = $true
 $LabelMailAddress.width          = 25
 $LabelMailAddress.height         = 10
 $LabelMailAddress.location       = New-Object System.Drawing.Point(74,25)
 $LabelMailAddress.Font           = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
-$TextBoxMail                     = New-Object system.Windows.Forms.TextBox
-$TextBoxMail.multiline           = $false
-$TextBoxMail.text                = "media@inplay.pro"
-$TextBoxMail.width               = 385
-$TextBoxMail.height              = 20
-$TextBoxMail.location            = New-Object System.Drawing.Point(187,22)
-$TextBoxMail.Font                = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+$LabelMailSubject               = New-Object system.Windows.Forms.Label
+$LabelMailSubject.text           = "Тема письма"
+$LabelMailSubject.AutoSize       = $true
+$LabelMailSubject.width          = 25
+$LabelMailSubject.height         = 10
+$LabelMailSubject.location       = New-Object System.Drawing.Point(74,60)
+$LabelMailSubject.Font           = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+
+$LabelMailFrom               = New-Object system.Windows.Forms.Label
+$LabelMailFrom.text           = "От кого"
+$LabelMailFrom.AutoSize       = $true
+$LabelMailFrom.width          = 25
+$LabelMailFrom.height         = 10
+$LabelMailFrom.location       = New-Object System.Drawing.Point(74,100)
+$LabelMailFrom.Font           = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+
+$LabelMailPassword           = New-Object system.Windows.Forms.Label
+$LabelMailPassword.text       = "Пароль"
+$LabelMailPassword.AutoSize   = $true
+$LabelMailPassword.width      = 25
+$LabelMailPassword.height     = 10
+$LabelMailPassword.location   = New-Object System.Drawing.Point(74,140)
+$LabelMailPassword.Font       = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+$TextBoxMailAdress                     = New-Object system.Windows.Forms.TextBox
+$TextBoxMailAdress.multiline           = $false
+$TextBoxMailAdress.text                = "media@inplay.pro"
+$TextBoxMailAdress.width               = 385
+$TextBoxMailAdress.height              = 20
+$TextBoxMailAdress.location            = New-Object System.Drawing.Point(187,22)
+$TextBoxMailAdress.Font                = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+$TextBoxMailSubject                     = New-Object system.Windows.Forms.TextBox
+$TextBoxMailSubject.multiline           = $false
+$TextBoxMailSubject.text                = "Список роликов"
+$TextBoxMailSubject.width               = 385
+$TextBoxMailSubject.height              = 20
+$TextBoxMailSubject.location            = New-Object System.Drawing.Point(187,60)
+$TextBoxMailSubject.Font                = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+$TextBoxMailFrom                    = New-Object system.Windows.Forms.TextBox
+$TextBoxMailFrom.multiline           = $false
+$TextBoxMailFrom.text                = "no-reply@inplay.pro"
+$TextBoxMailFrom.width               = 385
+$TextBoxMailFrom.height              = 20
+$TextBoxMailFrom.location            = New-Object System.Drawing.Point(187,100)
+$TextBoxMailFrom.Font                = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
+
+$TextBoxMailPassword                    = New-Object system.Windows.Forms.TextBox
+$TextBoxMailPassword.UseSystemPasswordChar = $true
+$TextBoxMailPassword.multiline           = $false
+$TextBoxMailPassword.width               = 385
+$TextBoxMailPassword.height              = 20
+$TextBoxMailPassword.location            = New-Object System.Drawing.Point(187,135)
+$TextBoxMailPassword.Font                = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $ButtonSchedulePath              = New-Object system.Windows.Forms.Button
 $ButtonSchedulePath.text         = "Расписание"
@@ -119,36 +169,41 @@ $ButtonSchedulePath.location     = New-Object System.Drawing.Point(18,10)
 $ButtonSchedulePath.Font         = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $ButtonAction              = New-Object system.Windows.Forms.Button
-$ButtonAction.text         = "Собрать падлу"
+$ButtonAction.text         = "Поехали"
 $ButtonAction.width        = 125
 $ButtonAction.height       = 30
-$ButtonAction.location     = New-Object System.Drawing.Point(480,220)
+$ButtonAction.location     = New-Object System.Drawing.Point(480,360)
 $ButtonAction.Font         = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $main.controls.AddRange(@($TextBox1,$GroupboxPrefixes,$GroupboxOptions,$GroupBoxMail,$ButtonSchedulePath,$ButtonAction))
 $GroupboxPrefixes.controls.AddRange(@($ReklamaCheckBox,$JingleCheckBox,$BilboardCheckBox,$CustomCheckBox,$TextBox2))
 $GroupboxOptions.controls.AddRange(@($CheckBoxPlaylist,$CheckBoxFolders))
-$GroupBoxMail.controls.AddRange(@($CheckBoxMailOn,$LabelMailAddress,$TextBoxMail))
+$GroupBoxMail.controls.AddRange(@($CheckBoxMailOn,$LabelMailAddress,$TextBoxMailAdress,$LabelMailSubject,$TextBoxMailSubject,$LabelMailFrom,
+$TextBoxMailFrom,$LabelMailPassword,$TextBoxMailPassword))
 
 # global integers
 
 $PredefinedCheckboxes = $ReklamaCheckBox, $JingleCheckBox, $BilboardCheckBox 
 $contentFolder = ".\Collection"
 
+# choose schedule
+
 $ButtonSchedulePath.Add_Click({
     $filePath = Get-FilePath
     Set-TextBoxText $TextBox1 $filePath
 })
 
+
 #main function
 
 $ButtonAction.Add_Click({
 
-    #list file create
-    if(!(Test-Path list.txt)){
+    #create list file
+
+    if(!(Test-Path .\list.txt)){
         New-Item list.txt
     }else{
-        Set-Content -Path list.txt -Value ""
+        Set-Content -Path .\list.txt -Value ""
     }
 
     $content = @()
@@ -249,8 +304,16 @@ $ButtonAction.Add_Click({
 
 
     # write list to file
-    
+
+
     $content | Out-File list.txt -Append
+
+    Create-Zip
+
+    if($CheckBoxMailOn){
+
+        Send-Mail($content)
+    }
     
 })
 
@@ -480,7 +543,7 @@ function Get-Details($event, $type){
             }
 
         }
-
+  
      return $message
     }
 
@@ -545,6 +608,65 @@ function Get-PlaylistTracks($playlist){
 
     return $paths
 }
+
+# email works
+
+function Send-Mail(){
+
+   
+    $serverSmtp = "smtp.yandex.ru"
+    $port = 587
+    $From = "no-reply@inplay.pro"
+
+    
+    $To = $TextBoxMailAdress.text 
+
+    $subject = $TextBoxMailSubject.Text
+
+    $user = $TextBoxMailFrom.Text
+    $pass = $TextBoxMailPassword.Text
+
+    $file = (Get-ChildItem .\Collection.zip | Select-Object FullName).FullName
+
+    $att = New-object Net.Mail.Attachment($file)
+    $mes = New-Object System.Net.Mail.MailMessage
+
+    $mes.From = $From
+    $mes.To.Add($To)
+    $mes.Subject = $subject
+    $mes.IsBodyHTML = $true
+    $mes.Body = (Out-String -InputObject $content)
+
+    $mes.Attachments.Add($att)
+
+    $smtp = New-Object Net.Mail.SmtpClient($serverSmtp, $port)
+
+    $smtp.EnableSSL = $true
+
+    $smtp.Credentials = New-Object System.Net.NetworkCredential($user, $pass);
+
+    $smtp.Send($mes)
+    $att.Dispose()
+    
+}
+
+function Create-Zip(){
+   
+   $options = @{
+        Path = ".\list.txt", ".\Collection\*.mp3"
+        CompressionLevel = "Fastest"
+        DestinationPath = "Collection"
+   }
+
+   if(Test-Path .\Collection.zip){
+        Compress-Archive @options -Force
+   }else{
+        Compress-Archive @options
+   }
+
+  
+} 
+
 
 
 #Start program
